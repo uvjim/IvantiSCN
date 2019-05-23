@@ -1,0 +1,9 @@
+|repeat,IncrementGlobal,IncrementField1,IncrementField2,Device ID,Device Name,IP,MAC,Memory,Disk Size,Used Size,Last User,Last Login,Purchased Date,Warranty
+5,|inc,,|inc|f,|guid,|inc|p|PC|.demokit.org|0|3,|ip|192.168.1.0|24,|mac,|size|512|8192|MB|MB|1|1,|size|1|4|TB|MB|1|1,|size|1|Disk Size|MB|MB|0|1,|lkp|%UserProfile%\Desktop\SCN\Users.csv|DEMOKIT\%FirstName%.%LastName%,|dt|%s|D|-3,|dt|%s|M|-12|1,|dt|%s|M|36|1|Purchased Date
+2,|inc,|inc|f,,|guid,|inc|p|SRV|.demokit-qa.org|0|3,|ip|192.168.2.0|24,|mac|-,|size|512|4096|MB|MB|1|1,|size|1|12|TB|MB|1|1,|size|1|Disk Size|MB|MB|0|1,|lkp|%UserProfile%\Desktop\SCN\Users.csv|DEMOKIT-QA\%FirstName%.%LastName%,|dt|%s|D|-5,|dt|%s|M|-6,|dt|%s|M|24|1|Purchased Date
+,|inc,,,|guid,|inc|p|COMP|.demokit.org|0|3,|ip|192.168.1.0|24,|mac|-,|size|512|8192|MB|MB|1|1,|size|1|200|TB|MB|1|1,|size|100|Disk Size|MB|MB|0|1,|lkp|%UserProfile%\Desktop\SCN\Users.csv|DEMOKIT-QA\%FirstName%.%LastName%,|dt|%s|D|-100,|dt|%s|M|-24,|dt|%s|M|12|1|Purchased Date
+,|inc,,|inc|f,|guid,|inc|ps|COMP|.demokit-qa.org|0|3,|ip|10.0.1.0|24,,,,,,,,
+,|inc,|inc|f,,|guid,|inc|ps|COMP|.demokit-qa.org|0|3,|ip|10.0.2.0|24,,,,,,,,
+2,|inc,,,|guid,|inc|s|PC|.uvjim.co.uk|0|3,|ip|192.168.3.0|255.255.255.0,,,,,,,,
+,|inc,,,|guid,|inc|s|SRV|.uvjim.co.uk|0|3,|ip|192.168.3.0|255.255.255.0,,,,,,,,
+,|inc,,,|guid,|inc|g|COMP| |0|3,|ip|192.168.1.0|24,,,,,,,,

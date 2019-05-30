@@ -89,9 +89,12 @@ Field codes are used to define what a fiedl should be populated with.  If the fi
                 
 * Lookup field - used to look up values from a CSV file.  The pattern should be:  
 
-  ###### `|lkp|path|field_format|key_field|key`
+  ###### `|lkp|Type|path|field_format|key_field|key`
   
   `lkp` = denotes a lookup field  
+  `Type` = Global, Field  
+  --> `Global` will use the same looked up row values across all lookup fields for that row  
+  --> `Field` will use a potentially different row of values to that of any other lookup field  
   `path` = full path to the CSV to lookup in  
   `field_format` = the fields to extract and the format they should take, e.g. "DOMAIN\%FirstName%.%LastName%"  
   `key_field` = lookup based on key_field (in lookup file) rather than selecting at random  

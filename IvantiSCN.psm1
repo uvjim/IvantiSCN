@@ -54,17 +54,17 @@
                     ip = denotes an IP field
                     network_address = provides the network address of the subnet in question
                     mask = can be CIDR (number of bits) or dotted decimal
-    Lookup field - used to look up values from a CSV file.  The pattern should be: |lkp|path|field_format|key_field|key
+    Lookup field - used to look up values from a CSV file.  The pattern should be: |lkp|Type|path|field_format|key_field|key
                     | = denotes a special field
                     lkp = denotes a lookup field
+                    Type = Global, Field
+                            Global - uses the same looked up row values across all lookup fields for that row
+                            Field - uses a potentially different row of values to that of any other lookup field
                     path = full path to the CSV to lookup in
                     field_format = the fields to extract and the format they should take, e.g. "DOMAIN\%FirstName%.%LastName%"
                     key_field = lookup based on key_field (in lookup file) rather than selecting at random
                     key = the field which contains the matching value (this should not be a linked field, but can be a value or field name)
 #>
-
-#$script:increment = 1
-#$script:persist = @{}
 
 $script:incrementers = @{
     'g' = 1;
@@ -220,6 +220,7 @@ function Initialize-SCNFields {
         }
 
         for($r=0; $r -lt $rowRepeat; $r++) {
+            $tLkpRow = $null
             foreach($fld in $header) {
                 if ($InputObject.($fld.Name)[0] -eq '|') {
                     $fDetails = $InputObject.($fld.Name).Split('|', [System.StringSplitOptions]::RemoveEmptyEntries)
@@ -385,10 +386,11 @@ function Initialize-SCNFields {
                             break
                         }
                         'lkp' {
-                            $tPath = [System.Environment]::ExpandEnvironmentVariables($fDetails[1])
-                            $tFormat = $fDetails[2]
-                            $tKeyField = if ($fDetails.Count -gt 3) { $fDetails[3] } else { $false }
-                            $tKeyValue = if ($fDetails.Count -gt 4) { $fDetails[4] } else { $false }
+                            $tType = $fDetails[1].toLower()
+                            $tPath = [System.Environment]::ExpandEnvironmentVariables($fDetails[2])
+                            $tFormat = $fDetails[3]
+                            $tKeyField = if ($fDetails.Count -gt 4) { $fDetails[4] } else { $false }
+                            $tKeyValue = if ($fDetails.Count -gt 5) { $fDetails[5] } else { $false }
                             ## get the fields we need to look for ##
                             $tPattern = "(%.+?%)"
                             $tFormatFields = [System.Text.RegularExpressions.Regex]::Matches($tFormat, $tPattern)
@@ -402,21 +404,30 @@ function Initialize-SCNFields {
                                 }
                             }
                             ## pick an entry from the lookup file ##
-                            if (-not $tKeyField) {
-                                $tRow = Get-Random -Minimum 0 -Maximum ($csv.Count - 1)
-                            } else {
-                                if ($tKeyField -notin $tCsvFields) {
-                                    throw("Invalid key field specified - $tKeyField")
+                            $tRow = $null
+                            if ($tType -eq 'g') {
+                                $tRow = $tLkpRow
+                            }
+                            if (-not $tRow) {
+                                if (-not $tKeyField) {
+                                    $tRow = Get-Random -Minimum 0 -Maximum ($csv.Count - 1)
+                                } else {
+                                    if ($tKeyField -notin $tCsvFields) {
+                                        throw("Invalid key field specified - $tKeyField")
+                                    }
+                                    if (-not $tKeyValue) {
+                                        throw("No value for the key field specified")
+                                    }
+                                    if ($tKeyValue -in ($header).Name) { # key value is a field name
+                                        $tKeyValue = $ret."$tKeyValue"
+                                    }
+                                    $tRow = $csv.IndexOf($($csv | Where $tKeyField -eq $tKeyValue))
+                                    if ($tRow -eq -1) {
+                                        throw("No corresponding row found in the lookup file")
+                                    }
                                 }
-                                if (-not $tKeyValue) {
-                                    throw("No value for the key field specified")
-                                }
-                                if ($tKeyValue -in ($header).Name) { # key value is a field name
-                                    $tKeyValue = $ret."$tKeyValue"
-                                }
-                                $tRow = $csv.IndexOf($($csv | Where $tKeyField -eq $tKeyValue))
-                                if ($tRow -eq -1) {
-                                    throw("No corresponding row found in the lookup file")
+                                if ($tType -eq 'g') {
+                                    $tLkpRow = $tRow
                                 }
                             }
                             ## build the result ##

@@ -103,6 +103,6 @@ Field codes are used to define what a fiedl should be populated with.  If the fi
 * Copy field - used to make the field have the same value as the specified field.  **_N.B. Copy fields are calculated after all other field interpolation is complete._**  
 
   ###### `|cp|Field`  
-  
-  `cp` = denotes a copy field
+
+  `cp` = denotes a copy field  
   `Field` = the heading of the field to copy

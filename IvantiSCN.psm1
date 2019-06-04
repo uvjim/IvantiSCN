@@ -64,6 +64,11 @@
                     field_format = the fields to extract and the format they should take, e.g. "DOMAIN\%FirstName%.%LastName%"
                     key_field = lookup based on key_field (in lookup file) rather than selecting at random
                     key = the field which contains the matching value (this should not be a linked field, but can be a value or field name)
+    Copy field - used to make the field have the same value as the specified field.  N.B. Copy fields are calculated after all other field interpolation is complete.
+                 Use the following pattern: |cp|Field
+                    | = denotes a special field
+                    cp = denotes a copy field
+                    Field = the heading of the field to copy
 #>
 
 $script:incrementers = @{
@@ -220,6 +225,7 @@ function Initialize-SCNFields {
         }
 
         for($r=0; $r -lt $rowRepeat; $r++) {
+            $fldCopy = @{}
             $tLkpRow = $null
             foreach($fld in $header) {
                 if ($InputObject.($fld.Name)[0] -eq '|') {
@@ -436,9 +442,20 @@ function Initialize-SCNFields {
                                 $tValue = $tValue.Replace($ff, $csv[$tRow].$($ff.ToString().Replace('%', '')))
                             }
                             $ret.($fld.Name) = $tValue
+                            break
+                        }
+                        'cp' {
+                            if ($fDetails[1] -notin $header) {
+                                throw("Invalid field specified in copy field - $($fDetails[1])")
+                            }
+                            $fldCopy[$fld.Name] = $fDetails[1]
+                            break
                         }
                     }
                 }
+            }
+            foreach($fld in $fldCopy.Keys) {
+                $ret.($fld) = $ret.($fldCopy.$fld)
             }
             if ($incWasGlobal) {
                 $script:incrementers.g++

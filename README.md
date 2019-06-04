@@ -99,3 +99,10 @@ Field codes are used to define what a fiedl should be populated with.  If the fi
   `field_format` = the fields to extract and the format they should take, e.g. "DOMAIN\%FirstName%.%LastName%"  
   `key_field` = lookup based on key_field (in lookup file) rather than selecting at random  
   `key` = the field which contains the matching value (this should not be a linked field, but can be a value or field name)  
+
+* Copy field - used to make the field have the same value as the specified field.  **_N.B. Copy fields are calculated after all other field interpolation is complete._**  
+
+  ###### `|cp|Field`  
+
+  `cp` = denotes a copy field  
+  `Field` = the heading of the field to copy
